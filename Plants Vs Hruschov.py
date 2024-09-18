@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 import sys
 import time
 import random
@@ -103,6 +104,13 @@ def pole():
     b = 0
     y = 0
     x = 0
+
+def music(file):
+    mixer.init()
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play(-1, 0.8)
+    pygame.mixer.music.set_volume(0.5)
+    time.sleep(0.1)
 
 img0 = pygame.image.load("Plants Vs Hruschov\goroh.png").convert_alpha()
 img1 =pygame.transform.scale(img0, (cl, cl))
@@ -239,6 +247,11 @@ pole()
 rast()
 lasttime = time.time()
 
+qwe = 0
+if qwe == 0:
+    music("Plants Vs Hruschov/aud1.mp3")
+    qwe = 1
+
 while game == 1:#######################################################################
     mB, mm, mmm = pygame.mouse.get_pressed(num_buttons=3)
     mX, mY = pygame.mouse.get_pos()
@@ -371,10 +384,6 @@ while game == 1:################################################################
 
     
     ##sc.blit(img, (0, 0))
-
-
-
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

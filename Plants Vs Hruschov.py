@@ -18,6 +18,13 @@ BLUE = (0, 162, 255)
 #Oh = oy - 250
 #cl = Oh // 5
 
+#if int(input("Музыка Вкл/Выкл - 1/0:"+ "\n")) == 1:
+#    qwe = 1
+#elif int(input()) == 0: 
+#    qwe = 0
+
+qwe = 0 # МУЗЫКА
+
 cl = 160 #160
 sc = pygame.display.set_mode((cl * 9, cl * 5 + cl))
 
@@ -52,6 +59,9 @@ strr = 0
 minn = 0
 lasttime = 0
 flagSTR = 0
+bal = 50
+Ts = time.time()
+zx = 0
 
 Xg = []
 Yg = []
@@ -67,6 +77,7 @@ XpP = []
 XpZ = []
 
 Lt = []
+Lt2 = []
 
 Xsh = [0, cl*1, cl*2, cl*3, cl*4, cl*5, cl*6, cl*7, cl*8]
 Ysh = [cl*5, cl*5, cl*5, cl*5, cl*5, cl*5, cl*5, cl*5, cl*5]
@@ -132,6 +143,7 @@ img3 =pygame.transform.scale(img02, (cl-10, cl-10))
 def hrusch(x, y):
     sc.blit(img3, (x + 5, y + 5))
 
+
 def snar(x, y):
     pygame.draw.circle(sc, RED, (x + cl*1.14, y + cl*0.25), cl/8)
 
@@ -191,18 +203,20 @@ def zomb():
     global Yz
     global XpZ
     global zom
-    X = 8
-    Y = random.randint(0, 4)
-    hrusch(X * cl, Y * cl)
-    Xz += [X * cl]
-    Yz += [Y * cl]
-    XpZ += [5]
-    zom += 1
+    a = random.randint(0, 100)
+    if a < 40:
+        X = 8
+        Y = random.randint(0, 4)
+        hrusch(X * cl, Y * cl)
+        Xz += [X * cl]
+        Yz += [Y * cl]
+        XpZ += [5]
+        zom += 1
 
 def shag():
     t = 0
     while t < zom:
-        Xz[t] -= cl
+        Xz[t] -= cl/2
         #print(Xz[t])
         #print("ZZZZZZZZ")
         t += 1
@@ -242,15 +256,16 @@ def rast():
         else:
             w += 1
 
+pygame.init()
+font = pygame.font.Font(None, int(cl/2.6))
 
 pole()
 rast()
 lasttime = time.time()
 
-qwe = 0
-if qwe == 0:
+if qwe == 1:
     music("Plants Vs Hruschov/aud1.mp3")
-    qwe = 1
+    qwe = 0
 
 while game == 1:#######################################################################
     mB, mm, mmm = pygame.mouse.get_pressed(num_buttons=3)
@@ -271,6 +286,10 @@ while game == 1:################################################################
     pole()
     rast()
 
+    txt_surface1 = font.render(str(bal), True, YELLOW)
+    sc.blit(txt_surface1, (cl*8.5, cl/20))
+
+    ## Обработка попаданий
     i = 0
     while i < strr:
         q = 0
@@ -297,7 +316,7 @@ while game == 1:################################################################
             q += 1
         i += 1
 
-    ## цикл ласттаймов
+    ## Обработка стрельбы
     v = 0
     while v < gor:
         if time.time() - Lt[v] > 3:
@@ -315,18 +334,30 @@ while game == 1:################################################################
                     Lt[v] = time.time()
                 w += 1
         v += 1
-    ## цикл ласттаймов
+
+    ## Обработка подсолнухов
+    v = 0
+    while v < pod:
+        if time.time() - Lt2[v] > 5:
+            bal += 25
+            Lt2[v] = time.time()
+            v += 1
+        else:
+            v += 1
+
+    if time.time() - Ts >= 15:
+        zx = 1 
 
     if flagSTR == 1:
         v = 0
-        if time.time() - asd > 0.01:
+        if time.time() - asd > 0.001:
             while v < strr:
-                Xs[v] += 10
+                Xs[v] += 2
                 asd = time.time()
                 v += 1
     
     ##########      ##########     ##########     ##########     TIME
-    if time.time() - lasttime > 2.5:
+    if time.time() - lasttime > 2 and zx == 1:
         shag()
         zomb()
         lasttime = time.time()
@@ -341,37 +372,41 @@ while game == 1:################################################################
             if sv == 1:
                 #print("zanyato blyaaaaaa")
                 pass
-            if sv == 0 and mB == 1:
+            if sv == 0 and mB == 1 and bal >= 50:
                 Xp += [mkx]
-                Yp += [mky] 
+                Yp += [mky]
+                Lt2 += [time.time()]
                 pod += 1
                 g = 555
+                bal -= 50
 
         if g == 1:
             sv = stat(mkx, mky)
             if sv == 1:
                 #print("zanyato")
                 pass
-            if sv == 0 and mB == 1:
+            if sv == 0 and mB == 1 and bal >= 100:
                 Xg += [mkx]
                 Yg += [mky]
                 Lt += [time.time()]
                 gor += 1
                 g = 555
+                bal -= 100
         
         if g == 2:
             sv = stat(mkx, mky)
             if sv == 1:
                 #print("zanyato blyaaaaaa")
                 pass
-            if sv == 0 and mB == 1:
+            if sv == 0 and mB == 1 and bal >= 25:
                 mina(mkx, mky)
                 Xm += [mkx]
                 Ym += [mky]
                 minn += 1
                 g = 555
+                bal -= 25
 
-        if g == 8:
+        if g == 8:                                     ##### СДЕЛАТЬ ЛОПАТУ ДЛЯ ВЫКАПЫВАНИЯ РАСТЕНИЙ
             sv = stat(mkx, mky)
             if sv == 1:
                 pass
@@ -384,6 +419,10 @@ while game == 1:################################################################
 
     
     ##sc.blit(img, (0, 0))
+
+
+
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
